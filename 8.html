@@ -1,0 +1,129 @@
+<html>
+<head>
+    <meta name="robots" content="noindex">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+            integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/js/jsonpath.jquery.min.js"></script>
+    <script type="application/javascript">
+        $(document).ready(function () {
+            $(function () {
+                const $jsonpath = $('.jsonpath');
+                const $expected = $('.expected');
+                const $output = $('.html-output');
+                const $input = $('.input');
+
+                function evalJSONPathUpdateResult(current) {
+                    try {
+
+                        var jsonpathExpr = current.find($jsonpath).val();
+                        var path = $.JSONPath({data: JSON.parse(current.find($input).text())})
+                        results = path.query(jsonpathExpr) // returns all authors
+
+                        var numberOfMatches = (results && typeof results != "boolean") ? results.length : 0;
+                        current.find('.number-of-matches').text(numberOfMatches);
+                        console.log(JSON.stringify(results))
+                        if (current.find($expected).text() === JSON.stringify(results)) {
+                            current.find($output).addClass('bg-success');
+                            current.find($output).removeClass('bg-danger');
+                        } else {
+                            current.find($output).removeClass('bg-success');
+                            current.find($output).addClass('bg-danger');
+                        }
+                        if (results) {
+                            current.find($output).html($('<div>').text(JSON.stringify(results, null, 4)).addClass('node'));
+                        } else {
+                            current.find($output).html($('<div>').text('Nothing found!').addClass('node'));
+                        }
+
+                    } catch (e) {
+                        current.find($output).removeClass('bg-success');
+                        current.find($output).addClass('bg-danger');
+                        current.find($output).html('ERROR: ' + e.message);
+                    }
+                }
+
+                $jsonpath.keyup(function () {
+                    evalJSONPathUpdateResult($(this).closest('.exercise'));
+                });
+            })
+        });
+    </script>
+
+    <style>
+        .border-info {
+            border-color: #1E5F98 !important;
+        }
+    </style>
+</head>
+<body>
+<div class="container border border-info px-3 mb-3 exercise">
+    <div class="row border-bottom bg-light border-info p-1 mb-2"><strong>Exercise:&nbsp;</strong>Select the title of the second element in the Array.
+    </div>
+    <label><strong>JSON Input</strong></label>
+    <pre lang="json" contentEditable="true" data-gramm="false" class="input p-1 border border-secondary pre-scrollable">
+{
+  "store": {
+    "albums": [{
+        "category": "rock",
+        "artist": "AC/DC",
+        "title": "Let There Be Rock Remastered",
+        "release_year": 2003,
+        "label": "Albert/Epic/Sony BMG",
+        "price": 6.95,
+        "in_stock": true
+      },
+      {
+        "category": "classical",
+        "artist": "Andrea Bocelli",
+        "title": "Believe Deluxe",
+        "release_year": 2020,
+        "label": "Decca",
+        "price": 14.99,
+        "in_stock": true
+      },
+      {
+        "category": "pop",
+        "artist": "Amy Winehouse",
+        "title": "Frank",
+        "release_year": 2007,
+        "label": "Universal Republic",
+        "price": 6.99,
+        "in_stock": false
+      },
+      {
+        "category": "rock",
+        "artist": "U2",
+        "title": "U218 Singles",
+        "release_year": 2010,
+        "label": "Universal",
+        "price": 25.55,
+        "in_stock": true
+      }
+    ]
+  },
+  "address": {
+    "street": "3673 Woodland Terrace",
+    "postal_code": "95628",
+    "city": "Fair Oaks",
+    "State": "California"
+  }
+}
+</pre>
+
+    <label><strong>JSONPath Expression</strong></label>
+    <input class="form-control form-control-sm border-secondary jsonpath mb-2" type="text" value="">
+    <pre class="expected d-none">["Believe Deluxe"]</pre>
+
+    <label><strong>Result</strong> (Number of matches: <span class="number-of-matches">0</span>)</label>
+    <pre lang="json" class="html-output text-white p-1 pre-scrollable">
+    </pre>
+    <div class="row border-top bg-light border-info text-right d-block p-1"><small>This exercise is fully tested in <a
+        target="_blank"
+        href="https://www.google.com/chrome/">Chrome</a>.</small>
+    </div>
+</div>
+</body>
+</html>
